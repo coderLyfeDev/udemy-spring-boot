@@ -1,0 +1,37 @@
+
+server:
+  port: 8082
+
+spring:
+  application:
+    name: ORDER-SERVICE
+  config:
+    import: optional:configserver:http://localhost:9296
+  datasource:
+    url: jdbc:h2:mem:order
+    username: sa
+    password: password!
+    driverClassName: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://dev-51106094.okta.com/oauth2/default
+      client:
+        registration:
+          internal-client:
+            provider: okta
+            authorization-grant-type: client_credentials
+            scope: internal
+            client-id: 0oa9gl0e613rIG7Fm5d7
+            client-secret: _j8YUtqZNWocdenx5MllXfu7QHg5UeqFmNzpo1aa
+        provider:
+          okta:
+            issuer-uri: https://dev-51106094.okta.com/oauth2/default
+eureka:
+  client:
+    enabled: false
