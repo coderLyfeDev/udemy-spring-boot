@@ -1,0 +1,46 @@
+
+server:
+  port: 8082
+
+spring:
+  application:
+    name: ORDER-SERVICE
+  config:
+    import: configserver:http://${CONFIG_SERVER_URL:localhost}:9296
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:3306/orderdb
+    username: username
+    password: password
+    driverClassName: com.mysql.cj.jdbc.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL55Dialect
+    hibernate:
+      ddl-auto: update
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://dev-51106094.okta.com/oauth2/default
+      client:
+        registration:
+          internal-client:
+            provider: okta
+            authorization-grant-type: client_credentials
+            scope: internal
+            client-id: 0oa9gl0e613rIG7Fm5d7
+            client-secret: _j8YUtqZNWocdenx5MllXfu7QHg5UeqFmNzpo1aa
+        provider:
+          okta:
+            issuer-uri: https://dev-51106094.okta.com/oauth2/default
+resilience4j:
+  circuitbreaker:
+    instance:
+      external:
+        event-consumer-buffer-size: 10
+        failure-rate-threshold: 50
+        minimum-number-of-calls: 5
+        automatic-transition-from-open-to-half-open-enabled: true
+        wait-duration-in-open-state: 5
+        permitted-number-of-call-in-half-open-state: 3
+        sliding-window-size: 10
+        sliding-window-type: COUNT_BASED
