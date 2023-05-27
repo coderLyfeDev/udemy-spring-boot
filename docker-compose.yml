@@ -1,0 +1,65 @@
+version: '3'
+services:
+  serviceregistry:
+    image: 'bharshaw24/coderlyfe-serviceregistry:latest'
+    container_name: serviceregistry
+    ports:
+      - '8761:8761'
+  configserver:
+    image: 'bharshaw24/coderlyfe-configserver:latest'
+    container_name: configserver
+    ports:
+      - '9296:9296'
+    environment:
+      - EUREKA_SERVER_ADDRESS=http://serviceregistry:8761/eureka
+    depends_on:
+      - serviceregistry
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://configserver:9296/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  cloudgateway:
+    image: 'bharshaw24/coderlyfe-cloudgateway:latest'
+    container_name: cloudgateway
+    ports:
+      - '9090:9090'
+    environment:
+      - EUREKA_SERVER_ADDRESS=http://serviceregistry:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      configserver:
+        condition: service_healthy
+  orderservice:
+    image: 'bharshaw24/coderlyfe-orderservice:latest'
+    container_name: orderservice
+    ports:
+      - '8082:8082'
+    environment:
+      - EUREKA_SERVER_ADDRESS=http://serviceregistry:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+      - DB_HOST=host.docker.internal
+    depends_on:
+      - cloudgateway
+  productservice:
+    image: 'bharshaw24/coderlyfe-productservice:latest'
+    container_name: productservice
+    ports:
+      - '8084:8084'
+    environment:
+      - EUREKA_SERVER_ADDRESS=http://serviceregistry:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+      - DB_HOST=host.docker.internal
+    depends_on:
+      - cloudgateway
+  paymentservice:
+    image: 'bharshaw24/coderlyfe-paymentservice:latest'
+    container_name: paymentservice
+    ports:
+      - '8081:8081'
+    environment:
+      - EUREKA_SERVER_ADDRESS=http://serviceregistry:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+      - DB_HOST=host.docker.internal
+    depends_on:
+      - cloudgateway
