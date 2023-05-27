@@ -1,0 +1,3 @@
+OrderService/src/main/resources/application.yaml
+PaymentService/src/main/resources/application.yaml
+productService/src/main/resources/application.yaml
